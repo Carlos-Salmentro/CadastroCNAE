@@ -7,12 +7,11 @@ namespace AberturaEmpresas.Entities
     public class Documento
     {
         [Key]
-        [Column(Order = 0)]
+        [Column("ID", Order = 0)]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-
         public int ID { get; private set; }
         
-        [Column(Order = 1, TypeName = "Nome")]
+        [Column("Nome" , Order = 1)]
         [Required]
         public string Nome { get; private set; }
 
