@@ -13,14 +13,14 @@ namespace AberturaEmpresas.EndPoints.Admin
         //public static string[] Methods = new string[] { HttpMethod.Get.ToString(), HttpMethod.Post.ToString(), HttpMethod.Delete.ToString(), HttpMethod.Put.ToString() };
 
         [HttpGet]
-        public static IResult Action([FromServices] AppDBContext context)
+        public IResult Action([FromServices] AppDBContext context)
         {
             List<CadastroEmpresa> cadastros = context.CadastroEmpresas.ToList();
             return Results.Ok(cadastros);
         }
 
         [HttpPost]
-        public static async Task<IResult> Action([FromBody] NovoCadastroEmpresaRequest novoCadastro, [FromServices] AppDBContext context)
+        public async Task<IResult> Action([FromBody] NovoCadastroEmpresaRequest novoCadastro, [FromServices] AppDBContext context)
         {
             Municipio municipio = context.Municipios.FirstOrDefault(x => x.Nome == novoCadastro.nomeMunicipio);
             if (municipio == null)
