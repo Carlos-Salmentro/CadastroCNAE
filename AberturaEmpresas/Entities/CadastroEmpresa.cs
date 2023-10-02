@@ -7,24 +7,24 @@ namespace AberturaEmpresas.Entities
     {
         //Definido pelo CnaeId + MunicipioNome
         [Key]
-        [Column(Order = 0, TypeName = "ID")]
+        [Column("ID" ,Order = 0)]
         public string ID { get; set; }
 
         [ForeignKey("CNAEId")]
-        [Column(Order = 1, TypeName = "CNAEId")]
+        [Column("CnaeID", Order = 1)]
         [Required]
         public string CNAEId { get; private set; }
 
         [ForeignKey("MunicipioNome")]
-        [Column(Order = 2, TypeName = "MunicipioId")]
+        [Column("MunicipioNome", Order = 2)]
         [Required]
         public string MunicipioNome { get; private set; }
 
-        [Column(Order = 3, TypeName = "Online")]
+        [Column("Online", Order = 3)]
         [Required]
         public bool Online { get; private set; }
 
-        [Column(Order = 4, TypeName = "Site")]
+        [Column("Site", Order = 4)]
         public string Site { get; private set; }
 
         public CadastroEmpresa(string cnaeId, string municipioNome, bool online, string? site)
