@@ -5,21 +5,22 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AberturaEmpresas.EndPoints.Admin
 {
-    public class CNAEs
+    [Route("/admin/CNAEs")]
+    public class CNAEs : Controller
     {
-        public static string Template => "/admin/CNAEs";
+        //public static string Template => "/admin/CNAEs";
         public static string[] Methods = new string[] { HttpMethod.Get.ToString(), HttpMethod.Post.ToString(), HttpMethod.Delete.ToString(), HttpMethod.Put.ToString() };
-        //        public static Delegate Handler => Action;
+        //public static Delegate Handler => Action;
 
         [HttpGet]
-        public static IResult Action([FromServices]AppDBContext context)
+        public IResult Action([FromServices]AppDBContext context)
         {
             List<CNAE> cnaes = context.CNAEs.OrderBy(x => x.Codigo).ToList();
             return Results.Ok(cnaes);
         }
 
         [HttpPost]
-        public static async Task<IResult> Action([FromBody] CnaeAddRequest cnaeAddRequest, [FromServices]AppDBContext context)
+        public async Task<IResult> Action([FromBody] CnaeAddRequest cnaeAddRequest, [FromServices]AppDBContext context)
         {
             if (context.CNAEs.FirstOrDefault(x => x.Codigo == cnaeAddRequest.codigo) != null)
             {
@@ -33,7 +34,7 @@ namespace AberturaEmpresas.EndPoints.Admin
         }
 
         [HttpDelete]
-        public static IResult Action([FromBody]string codigo, [FromServices]AppDBContext context)
+        public IResult Action([FromBody]string codigo, [FromServices]AppDBContext context)
         {
             CNAE cnae = context.CNAEs.FirstOrDefault(x => x.Codigo == codigo);
             

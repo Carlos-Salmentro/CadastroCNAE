@@ -4,15 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AberturaEmpresas.EndPoints.Admin
 {
-    public class RelacaoCnaeMunicipio
+    [Route("/admin/cnae{id}/municipio{nome}")]
+    public class RelacaoCnaeMunicipio : Controller
     {
-        public static string Template => "/admin/cnae{id}/municipio{nome}";
+        //public static string Template => "/admin/cnae{id}/municipio{nome}";
         public static string[] Methods = new string[] { HttpMethod.Get.ToString(), HttpMethod.Post.ToString(), HttpMethod.Delete.ToString(), HttpMethod.Put.ToString() };
-
 
         //obtendo os documentos da relacao CNAE/Municipio em questao
         [HttpGet]
-        public static IResult Action([FromRoute] string id, [FromRoute] string nome, [FromServices] AppDBContext context)
+        public IResult Action([FromRoute] string id, [FromRoute] string nome, [FromServices] AppDBContext context)
         {
             CNAE cnae = context.CNAEs.First(x => x.Codigo == id);
             CadastroEmpresa cadastro = context.CadastroEmpresas.First(x => x.CNAEId.Equals(id) && x.MunicipioNome.Equals(nome));
@@ -30,7 +30,7 @@ namespace AberturaEmpresas.EndPoints.Admin
 
         //adicionando documento ao cadastro
         [HttpPost]
-        public static async Task<IResult> Action([FromRoute] string id, [FromRoute] string nome, [FromBody] List<Documento> documentosAdd, [FromServices] AppDBContext context)
+        public async Task<IResult> Action([FromRoute] string id, [FromRoute] string nome, [FromBody] List<Documento> documentosAdd, [FromServices] AppDBContext context)
         {
             CadastroEmpresa cadastro = context.CadastroEmpresas.FirstOrDefault(x => x.CNAEId.Equals(id) && x.MunicipioNome.Equals(nome));
             List<Documento> listaDocumentos = new List<Documento>(context.Documentos.ToList());
