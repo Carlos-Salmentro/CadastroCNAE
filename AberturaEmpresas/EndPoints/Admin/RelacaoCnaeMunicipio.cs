@@ -1,41 +1,55 @@
 ﻿using AberturaEmpresas.DBService;
 using AberturaEmpresas.Entities;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace AberturaEmpresas.EndPoints.Admin
 {
-    [Route("/admin/cnae{id}/municipio{nome}")]
-    public class RelacaoCnaeMunicipio : Controller
+    [Route("/admin/[Controller]")]
+    public class RelacaoCnaeMunicipioController : Controller
     {
-        //public static string Template => "/admin/cnae{id}/municipio{nome}";
-        public static string[] Methods = new string[] { HttpMethod.Get.ToString(), HttpMethod.Post.ToString(), HttpMethod.Delete.ToString(), HttpMethod.Put.ToString() };
+        private readonly AppDBContext context;
+        public RelacaoCnaeMunicipioController(AppDBContext _context)
+        {
+            context = _context;
+        }
+
+        [HttpGet]
+        public IResult GetAll()
+        {
+            List<Municipio> municipios = context.Municipios.ToList();
+            List<CNAE> cnaes = context.CNAEs.ToList();
+
+            return Results.Ok();
+        }
 
         //obtendo os documentos da relacao CNAE/Municipio em questao
-        [HttpGet]
-        public IResult Action([FromRoute] string id, [FromRoute] string nome, [FromServices] AppDBContext context)
+        [HttpGet("CNAE/{idCnae}/Municipio/{nomeMunicipio}")]
+        public IResult GetRelacao([FromRoute] string idCnae, [FromRoute] string nomeMunicipio)
         {
-            CNAE cnae = context.CNAEs.First(x => x.Codigo == id);
-            CadastroEmpresa cadastro = context.CadastroEmpresas.First(x => x.CNAEId.Equals(id) && x.MunicipioNome.Equals(nome));
+            CNAE cnae = context.CNAEs.First(x => x.Codigo == idCnae);
+            CadastroEmpresa cadastro = context.CadastroEmpresas.First(x => x.CNAEId == idCnae && x.MunicipioNome == nomeMunicipio);
             string[] doc = new string[] { context.DocCad.Where(x => x.CadastroId == cadastro.ID.ToString()).Select(x => x.DocumentoId).ToString() };
 
             List<Documento> documentos = new List<Documento>();
 
             foreach (string x in doc)
             {
-                documentos.Add(context.Documentos.First(d => d.ID.ToString().Equals(x)));
+                documentos.Add(context.Documentos.First(d => d.ID.ToString() == x));
             }
 
-            return Results.Ok();
+            return Results.Ok(documentos);
         }
 
         //adicionando documento ao cadastro
-        [HttpPost]
-        public async Task<IResult> Action([FromRoute] string id, [FromRoute] string nome, [FromBody] List<Documento> documentosAdd, [FromServices] AppDBContext context)
+        [HttpPost("CNAE/{id}/Municipio/{nome}")]
+        public async Task<IActionResult> AddDocumento([FromRoute] string id, [FromRoute] string nome, [FromBody] List<Documento> documentosAdd)
         {
-            CadastroEmpresa cadastro = context.CadastroEmpresas.FirstOrDefault(x => x.CNAEId.Equals(id) && x.MunicipioNome.Equals(nome));
+            CadastroEmpresa cadastro = context.CadastroEmpresas.FirstOrDefault(x => x.CNAEId == id && x.MunicipioNome == nome);
             List<Documento> listaDocumentos = new List<Documento>(context.Documentos.ToList());
-            List<Documento> docJaExistente = new List<Documento>();
             List<Documento> docAdicionado = new List<Documento>();
+            List<Documento> docJaExistente = new List<Documento>();
+            StringBuilder sb = new StringBuilder();
 
             foreach (Documento doc in documentosAdd)
             {
@@ -53,7 +67,28 @@ namespace AberturaEmpresas.EndPoints.Admin
                 }
             }
 
-            return Results.Ok();
+            if (docAdicionado.Count > 0)
+            {
+                sb.AppendLine("Documentos adicionados:");
+                foreach (Documento documento in docAdicionado)
+                {
+                    sb.AppendLine(documento.Nome);
+                }
+
+                sb.AppendLine();
+            }
+
+            if (docJaExistente.Count > 0)
+            {
+                sb.AppendLine("Documentos já existentes que não foram adicionados:");
+                foreach (Documento documento in docJaExistente)
+                {
+                    sb.AppendLine(documento.Nome);
+                }
+            }
+
+            return Ok(sb.ToString());
+
         }
 
 

@@ -1,4 +1,4 @@
 ﻿namespace AberturaEmpresas.EndPoints.Requests
 {
-    public record PesquisaRequest(string cnaeId, string municipioNome);
+    public record PesquisaRequest(string cnaeCodigo, string municipioNome);
 }
